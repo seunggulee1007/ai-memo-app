@@ -3,8 +3,6 @@ import { hash } from 'bcryptjs';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { sql } from 'drizzle-orm';
-import { v4 as uuidv4 } from 'uuid';
-
 export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
