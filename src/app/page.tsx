@@ -21,7 +21,7 @@ export default function Home() {
               메모 시작하기
             </Link>
             <Link
-              href="/auth/login"
+              href="/login"
               className="bg-white hover:bg-gray-50 text-gray-900 font-semibold py-3 px-8 rounded-lg border border-gray-300 transition-colors duration-200 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
             >
               로그인
