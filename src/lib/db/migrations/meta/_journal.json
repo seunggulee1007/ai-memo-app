@@ -8,6 +8,13 @@
       "when": 1753684179370,
       "tag": "0000_talented_proudstar",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1753686308759,
+      "tag": "0001_glamorous_excalibur",
+      "breakpoints": true
     }
   ]
 }
