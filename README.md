@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Memo App
 
-## Getting Started
+AI 메모 애플리케이션 - Next.js 기반의 스마트 메모 관리 시스템
 
-First, run the development server:
+## 🚀 시작하기
+
+### 필수 요구사항
+
+- Node.js 18.0.0 이상
+- npm 또는 yarn
+
+### 설치 및 실행
 
 ```bash
+# 의존성 설치
+npm install
+
+# 개발 서버 실행
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# 프로덕션 빌드
+npm run build
+
+# 프로덕션 서버 실행
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인하세요.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ 개발 도구
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 코드 품질
 
-## Learn More
+```bash
+# 린팅
+npm run lint
 
-To learn more about Next.js, take a look at the following resources:
+# 린팅 및 자동 수정
+npm run lint:fix
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# 코드 포맷팅
+npm run format
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Git Hooks
 
-## Deploy on Vercel
+- **pre-commit**: 자동 린팅 및 포맷팅
+- **commit-msg**: 커밋 메시지 검증
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📁 프로젝트 구조
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/                 # Next.js App Router
+├── components/          # React 컴포넌트
+│   ├── ui/             # 기본 UI 컴포넌트
+│   └── layout/         # 레이아웃 컴포넌트
+├── lib/                # 유틸리티 함수
+└── types/              # TypeScript 타입 정의
+```
+
+## 🛠️ 기술 스택
+
+- **Framework**: Next.js 15.4.4
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Linting**: ESLint + Prettier
+- **Git Hooks**: Husky + lint-staged
+- **Commit Convention**: Conventional Commits
+
+## 📝 커밋 규칙
+
+커밋 메시지는 [Conventional Commits](https://www.conventionalcommits.org/) 규칙을 따릅니다:
+
+- `feat`: 새로운 기능
+- `fix`: 버그 수정
+- `docs`: 문서 수정
+- `style`: 코드 포맷팅
+- `refactor`: 코드 리팩토링
+- `test`: 테스트 추가/수정
+- `chore`: 빌드 프로세스 또는 보조 도구 변경
+
+## 🤝 기여하기
+
+1. 이슈를 생성하거나 기존 이슈를 확인하세요
+2. 새로운 브랜치를 생성하세요 (`feature/issue-number`)
+3. 변경사항을 커밋하세요
+4. Pull Request를 생성하세요
+
+## 📄 라이선스
+
+MIT License
