@@ -123,12 +123,12 @@ AI 메모 앱은 사용자가 메모를 작성하고 AI가 이를 분석하여 �
    - 전체 텍스트 검색 지원
    - 트랜잭션 및 데이터 무결성
 
-4. **AI 서비스 (OpenAI API)**
+4. **AI 서비스 (Anthropic Claude API)**
    - GPT-4를 통한 메모 분석
    - 텍스트 개선 및 구조화
    - 키워드 추출 및 요약
 
-5. **파일 스토리지 (AWS S3)**
+5. **파일 스토리지 (Supabase Storage)**
    - 이미지 및 문서 파일 저장
    - CDN을 통한 빠른 전송
    - 보안 및 접근 제어
@@ -225,10 +225,10 @@ TeamMember {
 
 ### 인프라 요구사항
 - **호스팅**: Vercel (프론트엔드 + API)
-- **데이터베이스**: PostgreSQL (Supabase 또는 PlanetScale)
-- **파일 스토리지**: AWS S3 또는 Cloudinary
-- **AI 서비스**: OpenAI API
-- **실시간**: Pusher 또는 Socket.io
+- **데이터베이스**: Supabase (PostgreSQL)
+- **파일 스토리지**: Supabase Storage
+- **AI 서비스**: Anthropic Claude API
+- **실시간**: Supabase Realtime
 - **모니터링**: Vercel Analytics + Sentry
 
 ## 개발 로드맵 (Development Roadmap)
@@ -365,7 +365,7 @@ TeamMember {
    - 기본 검색 기능
 
 4. **AI 분석 통합**
-   - OpenAI API 연동
+   - Anthropic Claude API 연동
    - AI 분석 요청 로직
    - 분석 결과 표시 UI
    - 개선 제안 적용 기능
@@ -413,7 +413,7 @@ TeamMember {
 
 ### 기술적 도전 과제
 1. **AI API 비용 및 성능**
-   - **리스크**: OpenAI API 사용량 증가로 인한 비용 증가
+   - **리스크**: Anthropic Claude API 사용량 증가로 인한 비용 증가
    - **완화 방안**: 
      - 요청 캐싱 구현
      - 사용량 제한 설정
@@ -480,12 +480,12 @@ TeamMember {
 
 ### 기술 스펙
 - **프론트엔드**: Next.js 15, React 19, TypeScript, Tailwind CSS
-- **백엔드**: Next.js API Routes, Prisma ORM
+- **백엔드**: Next.js API Routes, DrizzleORM
 - **데이터베이스**: PostgreSQL
-- **AI 서비스**: OpenAI GPT-4
+- **AI 서비스**: Anthropic Claude
 - **인증**: JWT, NextAuth.js
-- **파일 스토리지**: AWS S3
-- **실시간**: Socket.io 또는 Pusher
+- **파일 스토리지**: Supabase Storage
+- **실시간**: Supabase Realtime
 - **배포**: Vercel
 
 ### 성능 목표
