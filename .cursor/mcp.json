@@ -1,19 +1,38 @@
 {
-	"mcpServers": {
-		"task-master-ai": {
-			"command": "npx",
-			"args": ["-y", "--package=task-master-ai", "task-master-ai"],
-			"env": {
-				"ANTHROPIC_API_KEY": "YOUR_ANTHROPIC_API_KEY_HERE",
-				"PERPLEXITY_API_KEY": "YOUR_PERPLEXITY_API_KEY_HERE",
-				"OPENAI_API_KEY": "YOUR_OPENAI_KEY_HERE",
-				"GOOGLE_API_KEY": "YOUR_GOOGLE_KEY_HERE",
-				"XAI_API_KEY": "YOUR_XAI_KEY_HERE",
-				"OPENROUTER_API_KEY": "YOUR_OPENROUTER_KEY_HERE",
-				"MISTRAL_API_KEY": "YOUR_MISTRAL_KEY_HERE",
-				"AZURE_OPENAI_API_KEY": "YOUR_AZURE_KEY_HERE",
-				"OLLAMA_API_KEY": "YOUR_OLLAMA_API_KEY_HERE"
-			}
-		}
-	}
+  "mcpServers": {
+    "task-master-ai": {
+      "command": "npx",
+      "args": ["-y", "task-master-ai"],
+      "env": {
+        "ANTHROPIC_API_KEY": "YOUR_ANTHROPIC_API_KEY_HERE",
+        "PERPLEXITY_API_KEY": "YOUR_PERPLEXITY_API_KEY_HERE",
+        "OPENAI_API_KEY": "YOUR_OPENAI_KEY_HERE",
+        "GOOGLE_API_KEY": "YOUR_GOOGLE_KEY_HERE",
+        "XAI_API_KEY": "YOUR_XAI_KEY_HERE",
+        "OPENROUTER_API_KEY": "YOUR_OPENROUTER_KEY_HERE",
+        "MISTRAL_API_KEY": "YOUR_MISTRAL_KEY_HERE",
+        "AZURE_OPENAI_API_KEY": "YOUR_AZURE_KEY_HERE",
+        "OLLAMA_API_KEY": "YOUR_OLLAMA_API_KEY_HERE"
+      }
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--read-only",
+        "--project-ref=<project-ref>"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "<personal-access-token>"
+      }
+    },
+    "context7": {
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    }
+  }
 }
