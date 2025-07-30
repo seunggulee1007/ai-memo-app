@@ -5,6 +5,8 @@ import { users } from '@/lib/db/schema';
 import { sql } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 
+export const runtime = 'nodejs';
+
 export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
