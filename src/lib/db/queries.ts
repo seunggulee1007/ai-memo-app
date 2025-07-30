@@ -34,6 +34,7 @@ export async function getUserByEmail(email: string) {
 export async function createUser(data: {
   email: string;
   name: string;
+  password: string;
   avatar?: string;
 }) {
   const result = await db.insert(users).values(data).returning();
