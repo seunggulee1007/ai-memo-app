@@ -119,7 +119,7 @@ export default function RegisterPage() {
                 autoComplete="new-password"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="비밀번호 (최소 6자)"
+                placeholder={`비밀번호 (최소 ${MIN_PASSWORD_LENGTH}자)`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

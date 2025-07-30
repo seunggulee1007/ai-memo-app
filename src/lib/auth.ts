@@ -46,7 +46,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             avatar: user.avatar,
           };
         } catch (error) {
-          console.error('인증 오류:', error);
+          console.error('예기치 않은 인증 오류:', error);
           return null;
         }
       },
