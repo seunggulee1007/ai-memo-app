@@ -104,7 +104,7 @@
           11,
           12
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -120,7 +120,7 @@
           13,
           14
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -136,7 +136,7 @@
           13,
           15
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -152,7 +152,7 @@
           13,
           15
         ],
-        "status": "pending",
+        "status": "done",
         "subtasks": []
       },
       {
@@ -169,8 +169,62 @@
           15,
           17
         ],
-        "status": "pending",
-        "subtasks": []
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "고급 검색 API 및 의미 검색 API 통합 구현",
+            "description": "전체 텍스트 검색, 태그 필터, 날짜 범위, AI 기반 의미 검색 등 다양한 조건을 지원하는 통합 검색 API를 구현합니다.",
+            "dependencies": [],
+            "details": "기존 /api/memos/search 및 /api/memos/semantic-search 엔드포인트를 통합하거나, 공통 파라미터와 결과 구조를 표준화하여 다양한 검색 조건을 하나의 API에서 처리할 수 있도록 설계합니다. AI 의미 검색(Claude 임베딩)과 전통적 쿼리 검색을 옵션으로 선택 가능하게 합니다.",
+            "status": "done",
+            "testStrategy": "1. 다양한 검색 조건 조합별 API 응답 테스트\n2. 의미 검색과 일반 검색 결과 비교\n3. 에러 및 예외 상황 테스트"
+          },
+          {
+            "id": 2,
+            "title": "검색 UI 및 고급 필터 컴포넌트 구현",
+            "description": "검색 입력창, 태그 필터, 날짜 범위 선택, 정렬 옵션 등 고급 검색 UI 컴포넌트를 구현합니다.",
+            "dependencies": [
+              "18.1"
+            ],
+            "details": "검색어 입력, 태그 다중 선택, 날짜 범위, 정렬(최신순/오래된순/제목순) 등 다양한 필터와 옵션을 직관적으로 조작할 수 있는 UI를 설계합니다. 의미 검색 전환 토글, 검색 버튼, 초기화 기능 포함.",
+            "status": "done",
+            "testStrategy": "1. 각 UI 요소의 입력 및 동작 테스트\n2. 필터 조합별 검색 결과 연동 확인\n3. 접근성 및 반응형 레이아웃 테스트"
+          },
+          {
+            "id": 3,
+            "title": "검색 결과 하이라이팅 및 결과 표시 최적화",
+            "description": "검색 결과에서 키워드, 태그, 날짜 등 주요 정보와 일치 부분을 하이라이팅하고, 결과 리스트의 가독성과 성능을 최적화합니다.",
+            "dependencies": [
+              "18.2"
+            ],
+            "details": "검색어와 일치하는 텍스트(제목, 내용) 및 선택된 태그를 시각적으로 강조합니다. 대량 결과에 대한 페이지네이션 또는 무한 스크롤 적용, 결과 항목 내 태그/날짜/점수 등 메타데이터 표시.",
+            "status": "done",
+            "testStrategy": "1. 하이라이팅 정확성 테스트\n2. 대량 데이터에서의 렌더링 성능 측정\n3. 페이지네이션/스크롤 동작 검증"
+          },
+          {
+            "id": 4,
+            "title": "검색 히스토리 및 추천 검색어 기능 구현",
+            "description": "사용자의 최근 검색어, 인기 검색어, 추천 검색어 기능을 구현하여 검색 경험을 향상시킵니다.",
+            "dependencies": [
+              "18.2"
+            ],
+            "details": "로컬 또는 서버에 검색 히스토리를 저장하고, 최근/자주/추천 검색어를 자동 완성 또는 별도 영역에 노출합니다. 추천어는 통계 기반 또는 AI 기반으로 제공할 수 있습니다.",
+            "status": "done",
+            "testStrategy": "1. 검색 히스토리 저장 및 삭제 테스트\n2. 추천 검색어 노출 및 선택 동작 테스트\n3. 개인정보 보호 및 비식별화 검증"
+          },
+          {
+            "id": 5,
+            "title": "검색 성능 최적화 및 인덱싱/캐싱 적용",
+            "description": "검색 쿼리 성능을 높이기 위해 데이터베이스 인덱싱, 쿼리 최적화, 캐싱 전략을 적용합니다.",
+            "dependencies": [
+              "18.1"
+            ],
+            "details": "memos, tagsOnMemos 등 주요 테이블에 적절한 인덱스를 생성하고, 자주 사용되는 검색 조건에 대해 쿼리 플랜을 최적화합니다. 검색 결과 캐싱(SWR, Redis 등) 및 대량 데이터 대응 페이지네이션 구현.",
+            "status": "done",
+            "testStrategy": "1. 인덱스 적용 전후 쿼리 성능 측정\n2. 캐싱 적용 시 응답 속도 비교\n3. 동시 요청 및 대량 데이터 부하 테스트"
+          }
+        ]
       },
       {
         "id": 19,
@@ -297,11 +351,27 @@
         ],
         "status": "pending",
         "subtasks": []
+      },
+      {
+        "id": 26,
+        "title": "검색 기능 개선 및 최적화",
+        "description": "기존 검색 기능의 성능을 향상시키고, 고급 검색 필터, 자동완성, 검색 결과 하이라이팅 등의 기능을 추가하여 사용자 경험을 개선합니다.",
+        "details": "1. 검색 성능 최적화:\n```typescript\n// lib/search.ts\nimport { db } from '@/lib/db'\nimport { memos, tags, tagsOnMemos } from '@/drizzle/schema'\nimport { eq, and, or, ilike, sql } from 'drizzle-orm'\n\n// 전문 검색 인덱스 활용\nexport async function searchMemos(query: string, userId: string, filters?: SearchFilters) {\n  const searchTerms = query.split(' ').filter(term => term.length > 0)\n  \n  // PostgreSQL의 전문 검색 기능 활용\n  const searchQuery = db\n    .select({\n      id: memos.id,\n      title: memos.title,\n      content: memos.content,\n      createdAt: memos.createdAt,\n      rank: sql<number>`ts_rank(to_tsvector('korean', ${memos.title} || ' ' || ${memos.content}), plainto_tsquery('korean', ${query}))`\n    })\n    .from(memos)\n    .where(\n      and(\n        eq(memos.userId, userId),\n        sql`to_tsvector('korean', ${memos.title} || ' ' || ${memos.content}) @@ plainto_tsquery('korean', ${query})`\n      )\n    )\n    .orderBy(sql`rank DESC`)\n    .limit(50)\n    \n  return await searchQuery\n}\n```\n\n2. 고급 검색 필터 구현:\n```typescript\n// components/SearchFilters.tsx\ninterface SearchFilters {\n  dateRange?: { start: Date; end: Date }\n  tags?: string[]\n  contentType?: 'text' | 'image' | 'file'\n  sortBy?: 'relevance' | 'date' | 'title'\n}\n\nexport function SearchFilters({ filters, onFiltersChange }: SearchFiltersProps) {\n  return (\n    <div className=\"space-y-4 p-4 border rounded-lg\">\n      <div>\n        <label className=\"block text-sm font-medium mb-2\">날짜 범위</label>\n        <DateRangePicker\n          value={filters.dateRange}\n          onChange={(range) => onFiltersChange({ ...filters, dateRange: range })}\n        />\n      </div>\n      \n      <div>\n        <label className=\"block text-sm font-medium mb-2\">태그</label>\n        <TagSelector\n          selectedTags={filters.tags || []}\n          onTagsChange={(tags) => onFiltersChange({ ...filters, tags })}\n        />\n      </div>\n      \n      <div>\n        <label className=\"block text-sm font-medium mb-2\">콘텐츠 유형</label>\n        <Select\n          value={filters.contentType}\n          onValueChange={(type) => onFiltersChange({ ...filters, contentType: type })}\n        >\n          <SelectItem value=\"all\">전체</SelectItem>\n          <SelectItem value=\"text\">텍스트</SelectItem>\n          <SelectItem value=\"image\">이미지</SelectItem>\n          <SelectItem value=\"file\">파일</SelectItem>\n        </Select>\n      </div>\n    </div>\n  )\n}\n```\n\n3. 실시간 자동완성 기능:\n```typescript\n// hooks/useSearchSuggestions.ts\nimport { useState, useEffect, useMemo } from 'react'\nimport { debounce } from 'lodash'\n\nexport function useSearchSuggestions(query: string) {\n  const [suggestions, setSuggestions] = useState<string[]>([])\n  const [loading, setLoading] = useState(false)\n  \n  const debouncedFetch = useMemo(\n    () => debounce(async (searchQuery: string) => {\n      if (searchQuery.length < 2) {\n        setSuggestions([])\n        return\n      }\n      \n      setLoading(true)\n      try {\n        const response = await fetch(`/api/search/suggestions?q=${encodeURIComponent(searchQuery)}`)\n        const data = await response.json()\n        setSuggestions(data.suggestions)\n      } catch (error) {\n        console.error('Failed to fetch suggestions:', error)\n      } finally {\n        setLoading(false)\n      }\n    }, 300),\n    []\n  )\n  \n  useEffect(() => {\n    debouncedFetch(query)\n    return () => debouncedFetch.cancel()\n  }, [query, debouncedFetch])\n  \n  return { suggestions, loading }\n}\n```\n\n4. 검색 결과 하이라이팅:\n```typescript\n// components/SearchResultHighlight.tsx\ninterface HighlightProps {\n  text: string\n  searchQuery: string\n}\n\nexport function SearchResultHighlight({ text, searchQuery }: HighlightProps) {\n  const highlightText = (text: string, query: string) => {\n    if (!query) return text\n    \n    const regex = new RegExp(`(${query.split(' ').join('|')})`, 'gi')\n    const parts = text.split(regex)\n    \n    return parts.map((part, index) => {\n      if (regex.test(part)) {\n        return <mark key={index} className=\"bg-yellow-200 px-1 rounded\">{part}</mark>\n      }\n      return part\n    })\n  }\n  \n  return <span>{highlightText(text, searchQuery)}</span>\n}\n```\n\n5. 검색 히스토리 및 즐겨찾기:\n```typescript\n// lib/searchHistory.ts\nexport class SearchHistoryManager {\n  private static STORAGE_KEY = 'search_history'\n  private static MAX_HISTORY = 10\n  \n  static getHistory(): string[] {\n    const history = localStorage.getItem(this.STORAGE_KEY)\n    return history ? JSON.parse(history) : []\n  }\n  \n  static addToHistory(query: string) {\n    const history = this.getHistory()\n    const updatedHistory = [query, ...history.filter(h => h !== query)]\n      .slice(0, this.MAX_HISTORY)\n    \n    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedHistory))\n  }\n  \n  static clearHistory() {\n    localStorage.removeItem(this.STORAGE_KEY)\n  }\n}\n```\n\n6. 검색 분석 및 개선:\n```typescript\n// app/api/search/analytics/route.ts\nexport async function POST(req: Request) {\n  const { query, results, userId } = await req.json()\n  \n  // 검색 로그 저장\n  await db.insert(searchLogs).values({\n    id: generateId(),\n    userId,\n    query,\n    resultCount: results.length,\n    timestamp: new Date()\n  })\n  \n  return NextResponse.json({ success: true })\n}\n```",
+        "testStrategy": "1. 검색 성능 테스트:\n   - 대량 데이터(10,000+ 메모)에서 검색 응답 시간 측정\n   - 복잡한 쿼리 및 필터 조합 성능 테스트\n   - 동시 검색 요청 처리 능력 테스트\n   - 메모리 사용량 및 CPU 부하 모니터링\n\n2. 검색 정확도 테스트:\n   - 다양한 키워드 조합으로 관련성 높은 결과 반환 확인\n   - 한국어 형태소 분석 및 유사어 검색 정확도 테스트\n   - 태그, 날짜, 콘텐츠 유형 필터링 정확성 검증\n   - 검색 결과 순위 알고리즘 효과성 평가\n\n3. 사용자 경험 테스트:\n   - 자동완성 응답 속도 및 관련성 테스트\n   - 검색 결과 하이라이팅 정확성 확인\n   - 검색 히스토리 저장 및 불러오기 기능 테스트\n   - 모바일 및 데스크톱 환경에서의 UI/UX 테스트\n\n4. 엣지 케이스 테스트:\n   - 특수문자, 이모지 포함 검색어 처리\n   - 매우 긴 검색어 및 빈 검색어 처리\n   - 네트워크 오류 시 검색 기능 동작 확인\n   - 대용량 검색 결과 페이지네이션 테스트\n\n5. 보안 테스트:\n   - SQL 인젝션 방어 확인\n   - 사용자 권한 기반 검색 결과 필터링 검증\n   - 검색 로그 개인정보 보호 확인",
+        "status": "pending",
+        "dependencies": [
+          11,
+          12,
+          13,
+          15
+        ],
+        "priority": "medium",
+        "subtasks": []
       }
     ],
     "metadata": {
       "created": "2025-07-28T04:58:29.491Z",
-      "updated": "2025-07-28T07:11:24.764Z",
+      "updated": "2025-07-29T04:57:08.601Z",
       "description": "Tasks for master context"
     }
   }

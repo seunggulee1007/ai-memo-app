@@ -1,132 +1,84 @@
 # AI Memo App
 
-AI 메모 애플리케이션 - Next.js 기반의 스마트 메모 관리 시스템
+AI 기반 메모 작성 및 분석 애플리케이션입니다.
 
-## 🚀 시작하기
+## 기능
 
-### 필수 요구사항
+- 📝 메모 작성 및 편집
+- 🏷️ 태그 기반 메모 관리
+- 🤖 AI 기반 텍스트 분석 (문법 검토, 문체 개선, 구조 분석, 요약)
+- 👥 팀 협업 기능
+- 🔐 사용자 인증 및 권한 관리
 
-- Node.js 18.0.0 이상
-- npm 또는 yarn
+## 설치 및 실행
 
-### 설치 및 실행
+### 1. 의존성 설치
 
 ```bash
-# 의존성 설치
 npm install
-
-# 개발 서버 실행
-npm run dev
-
-# 프로덕션 빌드
-npm run build
-
-# 프로덕션 서버 실행
-npm start
 ```
 
-브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 결과를 확인하세요.
+### 2. 환경 변수 설정
 
-### 환경 변수 설정
-
-프로젝트 루트에 `.env.local` 파일을 생성하고 다음 환경 변수를 설정하세요:
+`.env.local` 파일을 생성하고 다음 변수들을 설정하세요:
 
 ```env
-# Supabase
+# Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-# Anthropic Claude API
+# Anthropic Claude API (AI 분석 기능용)
 ANTHROPIC_API_KEY=your_anthropic_api_key
 
-# Database
+# NextAuth Configuration
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+
+# Database Configuration
 DATABASE_URL=your_database_url
+
+# App Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-## 🛠️ 개발 도구
+### 3. AI 분석 기능 설정
 
-### 코드 품질
+AI 분석 기능을 사용하려면 Anthropic API 키가 필요합니다:
+
+1. [Anthropic Console](https://console.anthropic.com/)에서 계정을 생성하세요
+2. API 키를 발급받으세요
+3. `.env.local` 파일의 `ANTHROPIC_API_KEY`에 발급받은 키를 설정하세요
+
+**참고**: API 키가 설정되지 않은 경우 AI 분석 기능은 비활성화되며, 사용자에게 적절한 안내 메시지가 표시됩니다.
+
+### 4. 데이터베이스 설정
 
 ```bash
-# 린팅
-npm run lint
+# Supabase 로컬 개발 환경 시작
+npx supabase start
 
-# 린팅 및 자동 수정
-npm run lint:fix
-
-# 코드 포맷팅
-npm run format
+# 데이터베이스 마이그레이션 실행
+npx drizzle-kit push
 ```
 
-### Git Hooks
+### 5. 개발 서버 실행
 
-- **pre-commit**: 자동 린팅 및 포맷팅
-- **commit-msg**: 커밋 메시지 검증
-
-## 📁 프로젝트 구조
-
-```
-src/
-├── app/                 # Next.js App Router
-├── components/          # React 컴포넌트
-│   ├── ui/             # 기본 UI 컴포넌트
-│   └── layout/         # 레이아웃 컴포넌트
-├── lib/                # 라이브러리 및 설정
-│   ├── db/             # 데이터베이스 관련
-│   │   ├── schema.ts   # DrizzleORM 스키마
-│   │   ├── queries.ts  # 데이터베이스 쿼리
-│   │   └── migrations/ # 마이그레이션 파일
-│   ├── supabase.ts     # Supabase 클라이언트
-│   └── anthropic.ts    # Anthropic API 클라이언트
-├── utils/              # 유틸리티 함수
-└── types/              # TypeScript 타입 정의
+```bash
+npm run dev
 ```
 
-## 🛠️ 기술 스택
+브라우저에서 [http://localhost:3000](http://localhost:3000)을 열어 애플리케이션을 확인하세요.
 
-### Frontend
+## 기술 스택
 
-- **Framework**: Next.js 15.4.4
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS v4
-- **Linting**: ESLint + Prettier
-- **Git Hooks**: Husky + lint-staged
-- **Commit Convention**: Conventional Commits
-
-### Backend & Database
-
-- **ORM**: DrizzleORM
+- **Frontend**: Next.js 15, React, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes
 - **Database**: PostgreSQL (Supabase)
-- **Authentication**: Supabase Auth
-- **File Storage**: Supabase Storage
-- **Real-time**: Supabase Realtime
+- **Authentication**: NextAuth.js
+- **AI**: Anthropic Claude API
+- **ORM**: Drizzle ORM
 
-### AI & External Services
-
-- **AI Service**: Anthropic Claude API
-- **API Client**: Supabase JavaScript Client
-- **Environment**: Environment Variables
-
-## 📝 커밋 규칙
-
-커밋 메시지는 [Conventional Commits](https://www.conventionalcommits.org/) 규칙을 따릅니다:
-
-- `feat`: 새로운 기능
-- `fix`: 버그 수정
-- `docs`: 문서 수정
-- `style`: 코드 포맷팅
-- `refactor`: 코드 리팩토링
-- `test`: 테스트 추가/수정
-- `chore`: 빌드 프로세스 또는 보조 도구 변경
-
-## 🤝 기여하기
-
-1. 이슈를 생성하거나 기존 이슈를 확인하세요
-2. 새로운 브랜치를 생성하세요 (`feature/issue-number`)
-3. 변경사항을 커밋하세요
-4. Pull Request를 생성하세요
-
-## 📄 라이선스
+## 라이선스
 
 MIT License
