@@ -83,6 +83,24 @@ export const teamMembers = pgTable('team_members', {
   joinedAt: timestamp('joined_at').defaultNow().notNull(),
 });
 
+// Team Invitations table
+export const teamInvitations = pgTable('team_invitations', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  teamId: uuid('team_id')
+    .notNull()
+    .references(() => teams.id, { onDelete: 'cascade' }),
+  email: text('email').notNull(),
+  role: text('role').notNull().default('member'),
+  invitedBy: uuid('invited_by')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  token: text('token').notNull().unique(),
+  status: text('status').notNull().default('pending'), // 'pending', 'accepted', 'declined', 'expired'
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   memos: many(memos),
@@ -132,6 +150,7 @@ export const aiSuggestionsRelations = relations(aiSuggestions, ({ one }) => ({
 export const teamsRelations = relations(teams, ({ many }) => ({
   memos: many(memos),
   teamMembers: many(teamMembers),
+  invitations: many(teamInvitations),
 }));
 
 export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
@@ -144,3 +163,17 @@ export const teamMembersRelations = relations(teamMembers, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+export const teamInvitationsRelations = relations(
+  teamInvitations,
+  ({ one }) => ({
+    team: one(teams, {
+      fields: [teamInvitations.teamId],
+      references: [teams.id],
+    }),
+    invitedByUser: one(users, {
+      fields: [teamInvitations.invitedBy],
+      references: [users.id],
+    }),
+  })
+);

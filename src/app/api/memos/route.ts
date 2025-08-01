@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
+import { searchMemosWithFullText, SearchFilters } from '@/lib/search';
 import { db } from '@/lib/db';
-import { memos, memoTags, tags } from '@/lib/db/schema';
-import { eq, and, like, or, desc, sql, gte, lte, asc } from 'drizzle-orm';
+import { memos, memoTags } from '@/lib/db/schema';
 
 export const runtime = 'nodejs';
 
@@ -29,139 +29,20 @@ export async function GET(req: Request) {
 
     const skip = (page - 1) * limit;
 
-    // 기본 메모 조회 (검색 조건 포함)
-    const whereConditions = [eq(memos.userId, session.user.id)];
+    // 새로운 전문 검색 함수 사용
+    const searchFilters: SearchFilters = {
+      search: search || undefined,
+      tagIds,
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
+      sortBy: sortBy as SearchFilters['sortBy'],
+      sortOrder: sortOrder as SearchFilters['sortOrder'],
+      limit,
+      offset: skip,
+    };
 
-    // 텍스트 검색
-    if (search) {
-      whereConditions.push(
-        or(
-          like(memos.title, `%${search}%`),
-          like(memos.content, `%${search}%`)
-        )!
-      );
-    }
-
-    // 날짜 범위 필터링
-    if (startDate) {
-      whereConditions.push(gte(memos.createdAt, new Date(startDate)));
-    }
-
-    if (endDate) {
-      whereConditions.push(lte(memos.createdAt, new Date(endDate)));
-    }
-
-    // 정렬 조건 설정
-    let orderByClause;
-    switch (sortBy) {
-      case 'title':
-        orderByClause =
-          sortOrder === 'asc' ? asc(memos.title) : desc(memos.title);
-        break;
-      case 'createdAt':
-        orderByClause =
-          sortOrder === 'asc' ? asc(memos.createdAt) : desc(memos.createdAt);
-        break;
-      case 'updatedAt':
-      default:
-        orderByClause =
-          sortOrder === 'asc' ? asc(memos.updatedAt) : desc(memos.updatedAt);
-        break;
-    }
-
-    // 메모 조회
-    let memosData = await db
-      .select()
-      .from(memos)
-      .where(and(...whereConditions))
-      .orderBy(orderByClause)
-      .limit(limit)
-      .offset(skip);
-
-    // 태그 필터링 (메모 조회 후 필터링)
-    if (tagIds.length > 0) {
-      const memosWithTags = await Promise.all(
-        memosData.map(async (memo) => {
-          const tagsData = await db
-            .select()
-            .from(tags)
-            .innerJoin(
-              memoTags,
-              and(eq(memoTags.tagId, tags.id), eq(memoTags.memoId, memo.id))
-            );
-
-          return {
-            ...memo,
-            tags: tagsData.map(({ tags }) => tags),
-          };
-        })
-      );
-
-      // 지정된 태그를 모두 가지고 있는 메모만 필터링
-      memosData = memosWithTags.filter((memo) => {
-        const memoTagIds = memo.tags.map((tag: { id: string }) => tag.id);
-        return tagIds.every((tagId) => memoTagIds.includes(tagId));
-      });
-    } else {
-      // 태그 필터링이 없는 경우 기본 태그 조회
-      memosData = await Promise.all(
-        memosData.map(async (memo) => {
-          const tagsData = await db
-            .select()
-            .from(tags)
-            .innerJoin(
-              memoTags,
-              and(eq(memoTags.tagId, tags.id), eq(memoTags.memoId, memo.id))
-            );
-
-          return {
-            ...memo,
-            tags: tagsData.map(({ tags }) => tags),
-          };
-        })
-      );
-    }
-
-    // 총 개수 조회 (태그 필터링 적용)
-    let totalCount = memosData.length;
-
-    // 태그 필터링이 적용된 경우 정확한 개수를 계산하기 위해 다시 조회
-    if (tagIds.length > 0) {
-      const allMemosWithTags = await Promise.all(
-        (
-          await db
-            .select()
-            .from(memos)
-            .where(and(...whereConditions))
-        ).map(async (memo) => {
-          const tagsData = await db
-            .select()
-            .from(tags)
-            .innerJoin(
-              memoTags,
-              and(eq(memoTags.tagId, tags.id), eq(memoTags.memoId, memo.id))
-            );
-
-          return {
-            ...memo,
-            tags: tagsData.map(({ tags }) => tags),
-          };
-        })
-      );
-
-      totalCount = allMemosWithTags.filter((memo) => {
-        const memoTagIds = memo.tags.map((tag: { id: string }) => tag.id);
-        return tagIds.every((tagId) => memoTagIds.includes(tagId));
-      }).length;
-    } else {
-      // 태그 필터링이 없는 경우 기존 방식으로 개수 조회
-      const countResult = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(memos)
-        .where(and(...whereConditions));
-
-      totalCount = countResult[0]?.count || 0;
-    }
+    const { results: memosData, total: totalCount } =
+      await searchMemosWithFullText(session.user.id, searchFilters);
 
     return NextResponse.json({
       memos: memosData,
@@ -207,8 +88,8 @@ export async function POST(req: Request) {
       const result = await tx
         .insert(memos)
         .values({
-          title: title as string,
-          content: content as string,
+          title,
+          content,
           isPublic,
           userId: session.user!.id,
         })
