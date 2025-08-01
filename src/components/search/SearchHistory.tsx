@@ -1,34 +1,38 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { SearchHistoryManager } from '@/lib/searchHistory';
+import type { SearchHistoryItem } from '@/lib/searchHistory';
+import { SearchAnalyticsManager } from '@/lib/searchAnalytics';
 
 interface SearchHistoryProps {
   onSelectQuery: (query: string) => void;
-}
-
-interface SearchHistoryItem {
-  query: string;
-  timestamp: number;
-  count: number;
+  currentQuery?: string;
 }
 
 export default function SearchHistory({ onSelectQuery }: SearchHistoryProps) {
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
   const [popularQueries, setPopularQueries] = useState<string[]>([]);
   const [showHistory, setShowHistory] = useState(false);
+  const [searchStats, setSearchStats] = useState({
+    totalSearches: 0,
+    averageResults: 0,
+    mostPopularQuery: '',
+  });
 
-  // 로컬 스토리지에서 검색 히스토리 로드
+  // 검색 히스토리 로드
   useEffect(() => {
     const loadSearchHistory = () => {
-      try {
-        const history = localStorage.getItem('searchHistory');
-        if (history) {
-          const parsedHistory = JSON.parse(history) as SearchHistoryItem[];
-          setSearchHistory(parsedHistory);
-        }
-      } catch (error) {
-        console.error('검색 히스토리 로드 오류:', error);
-      }
+      const history = SearchHistoryManager.getHistory();
+      setSearchHistory(history);
+
+      // 검색 통계 로드
+      const analytics = SearchAnalyticsManager.generateAnalytics(30);
+      setSearchStats({
+        totalSearches: analytics.totalSearches,
+        averageResults: analytics.averageResults,
+        mostPopularQuery: analytics.mostPopularQuery || '',
+      });
     };
 
     loadSearchHistory();
@@ -61,34 +65,9 @@ export default function SearchHistory({ onSelectQuery }: SearchHistoryProps) {
 
   // 검색어 추가
   const addToHistory = (query: string) => {
-    if (!query.trim()) return;
-
-    const newHistory = [...searchHistory];
-    const existingIndex = newHistory.findIndex((item) => item.query === query);
-
-    if (existingIndex >= 0) {
-      // 기존 항목 업데이트
-      newHistory[existingIndex].count += 1;
-      newHistory[existingIndex].timestamp = Date.now();
-    } else {
-      // 새 항목 추가
-      newHistory.unshift({
-        query,
-        timestamp: Date.now(),
-        count: 1,
-      });
-    }
-
-    // 최대 20개까지만 유지
-    const limitedHistory = newHistory.slice(0, 20);
-    setSearchHistory(limitedHistory);
-
-    // 로컬 스토리지에 저장
-    try {
-      localStorage.setItem('searchHistory', JSON.stringify(limitedHistory));
-    } catch (error) {
-      console.error('검색 히스토리 저장 오류:', error);
-    }
+    SearchHistoryManager.addToHistory(query);
+    const history = SearchHistoryManager.getHistory();
+    setSearchHistory(history);
   };
 
   // 검색어 선택
@@ -101,24 +80,15 @@ export default function SearchHistory({ onSelectQuery }: SearchHistoryProps) {
   // 검색어 삭제
   const removeFromHistory = (query: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const newHistory = searchHistory.filter((item) => item.query !== query);
-    setSearchHistory(newHistory);
-
-    try {
-      localStorage.setItem('searchHistory', JSON.stringify(newHistory));
-    } catch (error) {
-      console.error('검색 히스토리 저장 오류:', error);
-    }
+    SearchHistoryManager.removeFromHistory(query);
+    const history = SearchHistoryManager.getHistory();
+    setSearchHistory(history);
   };
 
   // 히스토리 전체 삭제
   const clearHistory = () => {
+    SearchHistoryManager.clearHistory();
     setSearchHistory([]);
-    try {
-      localStorage.removeItem('searchHistory');
-    } catch (error) {
-      console.error('검색 히스토리 삭제 오류:', error);
-    }
   };
 
   // 시간 포맷팅
@@ -193,6 +163,20 @@ export default function SearchHistory({ onSelectQuery }: SearchHistoryProps) {
                 </button>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* 검색 통계 */}
+      {searchStats.totalSearches > 0 && (
+        <div className="mb-6 p-3 bg-blue-50 rounded-lg">
+          <h4 className="text-sm font-medium text-blue-700 mb-2">검색 통계</h4>
+          <div className="space-y-1 text-xs text-blue-600">
+            <div>총 검색: {searchStats.totalSearches}회</div>
+            <div>평균 결과: {searchStats.averageResults}개</div>
+            {searchStats.mostPopularQuery && (
+              <div>인기 검색어: "{searchStats.mostPopularQuery}"</div>
+            )}
           </div>
         </div>
       )}

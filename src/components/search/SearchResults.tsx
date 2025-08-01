@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
+// import { useState } from 'react';
+import SearchResultCard from './SearchResultCard';
+import SearchSummary from './SearchSummary';
 
 interface Tag {
   id: string;
@@ -29,6 +28,13 @@ interface SearchResultsProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  searchTime?: number;
+  filters?: {
+    tagIds: string[];
+    startDate: string;
+    endDate: string;
+    sortBy: string;
+  };
 }
 
 export default function SearchResults({
@@ -39,35 +45,15 @@ export default function SearchResults({
   currentPage,
   totalPages,
   onPageChange,
+  searchTime,
+  filters,
 }: SearchResultsProps) {
-  const [expandedMemo, setExpandedMemo] = useState<string | null>(null);
+  // const [expandedMemo, setExpandedMemo] = useState<string | null>(null);
 
-  // 검색어 하이라이팅 함수
-  const highlightText = (text: string, query: string) => {
-    if (!query.trim()) return text;
-
-    const regex = new RegExp(
-      `(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`,
-      'gi'
-    );
-    const parts = text.split(regex);
-
-    return parts.map((part, index) =>
-      regex.test(part) ? (
-        <mark key={index} className="bg-yellow-200 px-1 rounded">
-          {part}
-        </mark>
-      ) : (
-        part
-      )
-    );
-  };
-
-  // 메모 내용 미리보기 생성
-  const getContentPreview = (content: string, maxLength: number = 200) => {
-    const plainText = content.replace(/<[^>]*>/g, ''); // HTML 태그 제거
-    if (plainText.length <= maxLength) return plainText;
-    return plainText.substring(0, maxLength) + '...';
+  // 태그 클릭 핸들러
+  const handleTagClick = (tagName: string) => {
+    // 태그 클릭 시 해당 태그로 검색하도록 구현 가능
+    console.log('Tag clicked:', tagName);
   };
 
   if (isLoading) {
@@ -98,106 +84,24 @@ export default function SearchResults({
   return (
     <div className="space-y-4">
       {/* 검색 결과 요약 */}
-      <div className="flex justify-between items-center text-sm text-gray-600">
-        <span>
-          총 {totalResults}개의 메모를 찾았습니다
-          {searchQuery && ` ("${searchQuery}" 검색)`}
-        </span>
-        {totalPages > 1 && (
-          <span>
-            {currentPage} / {totalPages} 페이지
-          </span>
-        )}
-      </div>
+      <SearchSummary
+        totalResults={totalResults}
+        searchQuery={searchQuery}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        searchTime={searchTime}
+        filters={filters}
+      />
 
       {/* 메모 목록 */}
       <div className="space-y-4">
         {memos.map((memo) => (
-          <div
+          <SearchResultCard
             key={memo.id}
-            className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow"
-          >
-            {/* 메모 헤더 */}
-            <div className="flex justify-between items-start mb-2">
-              <div className="flex-1">
-                <Link
-                  href={`/memos/${memo.id}`}
-                  className="text-lg font-semibold text-gray-900 hover:text-indigo-600 transition-colors"
-                >
-                  {highlightText(memo.title, searchQuery)}
-                </Link>
-
-                {/* AI 검색 점수 표시 */}
-                {memo.score !== undefined && (
-                  <div className="inline-flex items-center ml-2 px-2 py-1 bg-indigo-100 text-indigo-800 text-xs rounded-full">
-                    <span className="mr-1">🤖</span>
-                    관련도: {memo.score}%
-                  </div>
-                )}
-              </div>
-
-              <div className="text-sm text-gray-500">
-                {format(new Date(memo.updatedAt), 'yyyy.MM.dd HH:mm', {
-                  locale: ko,
-                })}
-              </div>
-            </div>
-
-            {/* 메모 내용 */}
-            <div className="mb-3">
-              <p className="text-gray-700 leading-relaxed">
-                {expandedMemo === memo.id
-                  ? highlightText(memo.content, searchQuery)
-                  : highlightText(getContentPreview(memo.content), searchQuery)}
-              </p>
-
-              {memo.content.length > 200 && (
-                <button
-                  onClick={() =>
-                    setExpandedMemo(expandedMemo === memo.id ? null : memo.id)
-                  }
-                  className="text-indigo-600 hover:text-indigo-800 text-sm mt-1"
-                >
-                  {expandedMemo === memo.id ? '접기' : '더 보기'}
-                </button>
-              )}
-            </div>
-
-            {/* 태그 */}
-            {memo.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 mb-3">
-                {memo.tags.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="px-2 py-1 text-xs rounded-full font-medium"
-                    style={{
-                      backgroundColor: tag.color + '20',
-                      color: tag.color,
-                      border: `1px solid ${tag.color}40`,
-                    }}
-                  >
-                    {tag.name}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* 액션 버튼 */}
-            <div className="flex justify-end space-x-2">
-              <Link
-                href={`/memos/${memo.id}/edit`}
-                className="text-sm text-gray-600 hover:text-gray-800 px-3 py-1 rounded hover:bg-gray-100"
-              >
-                편집
-              </Link>
-              <Link
-                href={`/memos/${memo.id}`}
-                className="text-sm text-indigo-600 hover:text-indigo-800 px-3 py-1 rounded hover:bg-indigo-50"
-              >
-                보기
-              </Link>
-            </div>
-          </div>
+            memo={memo}
+            searchQuery={searchQuery}
+            onTagClick={handleTagClick}
+          />
         ))}
       </div>
 

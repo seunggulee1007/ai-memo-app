@@ -6,6 +6,12 @@ import AdvancedSearch, {
   SearchParams,
 } from '@/components/search/AdvancedSearch';
 import SearchResults from '@/components/search/SearchResults';
+import SearchFavorites from '@/components/search/SearchFavorites';
+import SearchAnalytics from '@/components/search/SearchAnalytics';
+import SearchHistory from '@/components/search/SearchHistory';
+import { SearchAnalyticsManager } from '@/lib/searchAnalytics';
+import { SearchHistoryManager } from '@/lib/searchHistory';
+import type { SearchFavorite } from '@/lib/searchFavorites';
 
 interface Tag {
   id: string;
@@ -34,6 +40,18 @@ export default function SearchPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentFilters, setCurrentFilters] = useState<
+    SearchFavorite['filters']
+  >({
+    tagIds: [],
+    startDate: '',
+    endDate: '',
+    sortBy: 'updatedAt',
+    sortOrder: 'desc',
+    useSemanticSearch: false,
+  });
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   // 태그 목록 로드
   useEffect(() => {
@@ -66,6 +84,16 @@ export default function SearchPage() {
     setSearchQuery(search);
     setCurrentPage(page);
 
+    // 현재 필터 상태 업데이트
+    setCurrentFilters({
+      tagIds,
+      startDate,
+      endDate,
+      sortBy: sortBy as SearchParams['sortBy'],
+      sortOrder: sortOrder as SearchParams['sortOrder'],
+      useSemanticSearch,
+    });
+
     // 검색 조건이 있으면 자동으로 검색 실행
     if (search || tagIds.length > 0 || startDate || endDate) {
       performSearch(
@@ -86,6 +114,7 @@ export default function SearchPage() {
   // 검색 실행 함수
   const performSearch = async (params: SearchParams, page: number = 1) => {
     setIsLoading(true);
+    const startTime = Date.now();
 
     try {
       const searchParams = new URLSearchParams();
@@ -137,6 +166,30 @@ export default function SearchPage() {
           throw new Error('검색에 실패했습니다.');
         }
       }
+
+      // 검색 분석 로그 저장
+      const searchTime = Date.now() - startTime;
+      SearchAnalyticsManager.logSearchEvent({
+        query: params.search || '',
+        resultCount: totalResults,
+        searchTime,
+        filters: {
+          tagIds: params.tagIds,
+          startDate: params.startDate || '',
+          endDate: params.endDate || '',
+          sortBy: params.sortBy,
+          useSemanticSearch: params.useSemanticSearch,
+        },
+      });
+
+      // 검색 히스토리에 추가
+      if (params.search) {
+        SearchHistoryManager.addToHistory(
+          params.search,
+          params.tagIds,
+          totalResults
+        );
+      }
     } catch (error) {
       console.error('검색 오류:', error);
       setMemos([]);
@@ -171,30 +224,100 @@ export default function SearchPage() {
     router.push(`/search?${currentParams.toString()}`);
   };
 
+  // 즐겨찾기 선택 핸들러
+  const handleSelectFavorite = (favorite: SearchFavorite) => {
+    const newSearchParams = new URLSearchParams();
+    if (favorite.query) newSearchParams.append('search', favorite.query);
+    favorite.filters.tagIds.forEach((tagId) =>
+      newSearchParams.append('tagId', tagId)
+    );
+    if (favorite.filters.startDate)
+      newSearchParams.append('startDate', favorite.filters.startDate);
+    if (favorite.filters.endDate)
+      newSearchParams.append('endDate', favorite.filters.endDate);
+    newSearchParams.append('sortBy', favorite.filters.sortBy);
+    newSearchParams.append('sortOrder', favorite.filters.sortOrder);
+    if (favorite.filters.useSemanticSearch)
+      newSearchParams.append('useSemanticSearch', 'true');
+    newSearchParams.append('page', '1');
+
+    router.push(`/search?${newSearchParams.toString()}`);
+  };
+
+  // 검색 히스토리 선택 핸들러
+  const handleSelectHistoryQuery = (query: string) => {
+    const newSearchParams = new URLSearchParams();
+    newSearchParams.append('search', query);
+    newSearchParams.append('page', '1');
+    router.push(`/search?${newSearchParams.toString()}`);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">고급 검색</h1>
-        <p className="text-gray-600">
-          메모 제목, 내용, 태그, 날짜 등을 조합하여 원하는 메모를 찾아보세요.
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">고급 검색</h1>
+            <p className="text-gray-600">
+              메모 제목, 내용, 태그, 날짜 등을 조합하여 원하는 메모를
+              찾아보세요.
+            </p>
+          </div>
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+            >
+              {showHistory ? '히스토리 숨기기' : '검색 히스토리'}
+            </button>
+            <button
+              onClick={() => setShowAnalytics(!showAnalytics)}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              {showAnalytics ? '분석 숨기기' : '검색 분석'}
+            </button>
+          </div>
+        </div>
       </div>
 
-      <AdvancedSearch
-        tags={tags}
-        onSearch={handleSearch}
-        isLoading={isLoading}
-      />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* 메인 검색 영역 */}
+        <div className="lg:col-span-2 space-y-6">
+          <AdvancedSearch
+            tags={tags}
+            onSearch={handleSearch}
+            isLoading={isLoading}
+          />
 
-      <SearchResults
-        memos={memos}
-        isLoading={isLoading}
-        searchQuery={searchQuery}
-        totalResults={totalResults}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+          <SearchResults
+            memos={memos}
+            isLoading={isLoading}
+            searchQuery={searchQuery}
+            totalResults={totalResults}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+
+        {/* 사이드바 */}
+        <div className="space-y-6">
+          <SearchFavorites
+            onSelectFavorite={handleSelectFavorite}
+            currentQuery={searchQuery}
+            currentFilters={currentFilters}
+          />
+
+          {showHistory && (
+            <SearchHistory
+              onSelectQuery={handleSelectHistoryQuery}
+              currentQuery={searchQuery}
+            />
+          )}
+
+          {showAnalytics && <SearchAnalytics days={30} />}
+        </div>
+      </div>
     </div>
   );
 }

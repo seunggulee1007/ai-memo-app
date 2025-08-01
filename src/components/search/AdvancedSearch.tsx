@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import SearchHistory from './SearchHistory';
+import SearchAutocomplete from './SearchAutocomplete';
 
 interface Tag {
   id: string;
@@ -21,7 +22,7 @@ export interface SearchParams {
   tagIds: string[];
   startDate: string;
   endDate: string;
-  sortBy: 'updatedAt' | 'createdAt' | 'title';
+  sortBy: 'relevance' | 'updatedAt' | 'createdAt' | 'title';
   sortOrder: 'asc' | 'desc';
   useSemanticSearch: boolean;
 }
@@ -34,7 +35,6 @@ export default function AdvancedSearch({
   const searchParams = useSearchParams();
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
   const [searchParamsState, setSearchParamsState] = useState<SearchParams>({
     search: searchParams.get('search') || '',
     tagIds: searchParams.getAll('tagId'),
@@ -74,11 +74,11 @@ export default function AdvancedSearch({
     }));
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
+  // const handleKeyPress = (e: React.KeyboardEvent) => {
+  //   if (e.key === 'Enter') {
+  //     handleSearch();
+  //   }
+  // };
 
   const handleHistorySelect = (query: string) => {
     setSearchParamsState((prev) => ({
@@ -92,33 +92,23 @@ export default function AdvancedSearch({
       {/* 기본 검색 영역 */}
       <div className="flex items-center space-x-3 mb-4">
         <div className="flex-1 relative">
-          <input
-            type="text"
-            placeholder="메모 검색..."
+          <SearchAutocomplete
             value={searchParamsState.search}
-            onChange={(e) =>
+            onChange={(value) =>
               setSearchParamsState((prev) => ({
                 ...prev,
-                search: e.target.value,
+                search: value,
               }))
             }
-            onKeyPress={handleKeyPress}
-            onFocus={() => setShowHistory(true)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            onSelect={(value) =>
+              setSearchParamsState((prev) => ({
+                ...prev,
+                search: value,
+              }))
+            }
+            placeholder="메모 검색..."
+            className="w-full"
           />
-          <div className="absolute right-3 top-2.5">
-            <span className="text-gray-400">🔍</span>
-          </div>
-
-          {/* 검색 히스토리 드롭다운 */}
-          {showHistory && (
-            <div className="absolute top-full left-0 right-0 z-10 mt-1">
-              <SearchHistory
-                onSelectQuery={handleHistorySelect}
-                currentQuery={searchParamsState.search}
-              />
-            </div>
-          )}
         </div>
 
         <button
@@ -225,6 +215,7 @@ export default function AdvancedSearch({
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               >
+                <option value="relevance">관련성</option>
                 <option value="updatedAt">수정일</option>
                 <option value="createdAt">작성일</option>
                 <option value="title">제목</option>
